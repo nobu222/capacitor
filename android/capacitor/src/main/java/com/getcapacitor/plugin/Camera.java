@@ -7,9 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.util.Base64;
 import android.util.Log;
 import com.getcapacitor.Dialogs;
@@ -34,8 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * The Camera plugin makes it easy to take a photo or have the user select a photo
@@ -359,7 +356,6 @@ public class Camera extends Plugin {
       bis = new ByteArrayInputStream(bitmapOutputStream.toByteArray());
       Uri newUri = saveTemporaryImage(bitmap, u, bis);
       JSObject ret = new JSObject();
-      ret.put("format", "jpeg");
       ret.put("exif", exif.toJson());
       ret.put("path", newUri.toString());
       ret.put("webPath", FileUtils.getPortablePath(getContext(), bridge.getLocalUrl(), newUri));
@@ -407,10 +403,9 @@ public class Camera extends Plugin {
 
   private void returnDataUrl(PluginCall call, ExifWrapper exif, ByteArrayOutputStream bitmapOutputStream) {
     byte[] byteArray = bitmapOutputStream.toByteArray();
-    String encoded = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+    String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
     JSObject data = new JSObject();
-    data.put("format", "jpeg");
     data.put("dataUrl", "data:image/jpeg;base64," + encoded);
     data.put("exif", exif.toJson());
     call.resolve(data);
@@ -418,10 +413,9 @@ public class Camera extends Plugin {
 
   private void returnBase64(PluginCall call, ExifWrapper exif, ByteArrayOutputStream bitmapOutputStream) {
     byte[] byteArray = bitmapOutputStream.toByteArray();
-    String encoded = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+    String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
     JSObject data = new JSObject();
-    data.put("format", "jpeg");
     data.put("base64String", encoded);
     data.put("exif", exif.toJson());
     call.resolve(data);

@@ -3,8 +3,9 @@ package com.getcapacitor;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
 import com.getcapacitor.android.R;
@@ -50,6 +51,12 @@ public class BridgeActivity extends AppCompatActivity {
     setTheme(getResources().getIdentifier("AppTheme_NoActionBar", "style", getPackageName()));
     setTheme(R.style.AppTheme_NoActionBar);
 
+    boolean defaultDebuggable = false;
+    if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+      defaultDebuggable = true;
+    }
+
+    WebView.setWebContentsDebuggingEnabled(Config.getBoolean("android.webContentsDebuggingEnabled", defaultDebuggable));
 
     setContentView(R.layout.bridge_layout_main);
 
@@ -63,7 +70,6 @@ public class BridgeActivity extends AppCompatActivity {
     Log.d(LogUtils.getCoreTag(), "Starting BridgeActivity");
 
     webView = findViewById(R.id.webview);
-
     cordovaInterface = new MockCordovaInterfaceImpl(this);
     if (savedInstanceState != null) {
       cordovaInterface.restoreInstanceState(savedInstanceState);
@@ -74,7 +80,7 @@ public class BridgeActivity extends AppCompatActivity {
 
     pluginManager = mockWebView.getPluginManager();
     cordovaInterface.onCordovaInit(pluginManager);
-    bridge = new Bridge(this, webView, initialPlugins, cordovaInterface, pluginManager, preferences);
+    bridge = new Bridge(this, webView, initialPlugins, cordovaInterface, pluginManager);
 
     Splash.showOnLaunch(this);
 
